@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Инвойс-генератор для техника</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #e5e7eb;
+      color: #111827;
+      display: flex;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 960px;
+    }
+
+    .tool-panel {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+    }
+
+    .tool-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .tool-header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 600;
+      border: 1px solid #bfdbfe;
+    }
+
+    .section-title {
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .form-group {
+      flex: 1 1 220px;
+      min-width: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: #374151;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px #3b82f6;
+    }
+
+    .small-hint {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: none;
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #f3f4f6;
+      color: #111827;
+      border: 1px solid #e5e7eb;
+    }
+
+    button:hover {
+      filter: brightness(0.97);
+    }
+
+    .invoice-wrapper {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 24px 28px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+      border: 1px solid #e5e7eb;
+    }
+
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+    }
+
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #1d4ed8, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .logo-text-main {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .logo-text-sub {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .invoice-meta {
+      text-align: right;
+      font-size: 12px;
+      color: #4b5563;
+    }
+
+    .invoice-parties {
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: #4b5563;
+    }
+
+    .party-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .party-text {
+      white-space: pre-line;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 8px 9px;
+      min-height: 60px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    th, td {
+      padding: 8px 6px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: right;
+    }
+
+    th:first-child, td:first-child {
+      text-align: left;
+    }
+
+    thead th {
+      background: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .item-desc {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .item-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #6b7280;
+      flex-shrink: 0;
+    }
+
+    tfoot td {
+      font-weight: 600;
+      border-bottom: none;
+    }
+
+    .totals-row {
+      background: #f9fafb;
+    }
+
+    /* Подписи */
+    .signature-block {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 11px;
+      color: #4b5563;
+    }
+
+    .signature-row {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 12px;
+    }
+
+    .signature-col {
+      flex: 1 1 220px;
+    }
+
+    .sig-line {
+      border-bottom: 1px solid #9ca3af;
+      height: 22px;
+      margin-bottom: 4px;
+    }
+
+    .sig-label {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .tool-panel { display: none; }
+      .invoice-wrapper { border: none; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ПАНЕЛЬ ВВОДА -->
+    <div class="tool-panel">
+      <div class="tool-header">
+        <div>
+          <h1>Инвойс-генератор для техника</h1>
+          <div class="subtitle">
+            Клиент видит только таблицу и итоги. Все расчёты скрыты.
+          </div>
+        </div>
+        <div class="badge">4 Parts • 1 Labor • Tax 7.96% (Parts)</div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Компания</label>
+          <input id="companyName" type="text" placeholder="Wilson and Mayer appliance repairs" />
+        </div>
+        <div class="form-group">
+          <label>Номер инвойса</label>
+          <input id="invoiceNumber" type="text" placeholder="6551" />
+        </div>
+        <div class="form-group">
+          <label>Дата</label>
+          <input id="invoiceDate" type="text" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Желаемая чистая прибыль (USD)</label>
+          <input id="profit" type="number" placeholder="например, 200" />
+          <div class="small-hint">Используется только в расчётах, клиент этого не видит.</div>
+        </div>
+      </div>
+
+      <div class="section-title">Детали (Parts)</div>
+      <div class="small-hint">Заполняй только нужные. Пустые строки игнорируются.</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Название детали 1</label>
+          <input id="partName1" type="text" placeholder="OEM Idler Pulley Assembly GE" />
+        </div>
+        <div class="form-group">
+          <label>Реальная цена детали 1</label>
+          <input id="partCost1" type="number" step="0.01" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Название детали 2</label>
+          <input id="partName2" type="text" placeholder="OEM High-Temp Drive Belt GE" />
+        </div>
+        <div class="form-group">
+          <label>Реальная цена детали 2</label>
+          <input id="partCost2" type="number" step="0.01" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Название детали 3</label>
+          <input id="partName3" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Реальная цена детали 3</label>
+          <input id="partCost3" type="number" step="0.01" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Название детали 4</label>
+          <input id="partName4" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Реальная цена детали 4</label>
+          <input id="partCost4" type="number" step="0.01" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button id="generateBtn">Сгенерировать инвойс</button>
+        <button class="secondary" onclick="window.print()">PDF / Print</button>
+      </div>
+    </div>
+
+    <!-- ИНВОЙС -->
+    <div class="invoice-wrapper">
+      <div class="invoice-header">
+        <div class="logo-block">
+          <div class="logo-circle">W&amp;M</div>
+          <div>
+            <div class="logo-text-main" id="logoText">Ваше название</div>
+            <div class="logo-text-sub">Appliance Repair</div>
+          </div>
+        </div>
+        <div class="invoice-meta">
+          <div id="metaNumber">Invoice #: —</div>
+          <div id="metaDate">Date: —</div>
+        </div>
+      </div>
+
+      <div class="invoice-parties">
+        <div class="party-title">Bill To:</div>
+        <div class="party-text" contenteditable="true">
+Name:  
+Phone:  
+Address:  
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>Unit</th>
+            <th>Tax</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Part rows -->
+          <tr id="rowPart1" style="display:none;">
+            <td>
+              <span class="item-desc">
+                <span class="item-icon">P</span>
+                <span id="partNameCell1"></span>
+              </span>
+            </td>
+            <td>1</td>
+            <td id="partUnit1">$0.00</td>
+            <td id="partTax1">$0.00</td>
+            <td id="partTotal1">$0.00</td>
+          </tr>
+
+          <tr id="rowPart2" style="display:none;">
+            <td>
+              <span class="item-desc">
+                <span class="item-icon">P</span>
+                <span id="partNameCell2"></span>
+              </span>
+            </td>
+            <td>1</td>
+            <td id="partUnit2">$0.00</td>
+            <td id="partTax2">$0.00</td>
+            <td id="partTotal2">$0.00</td>
+          </tr>
+
+          <tr id="rowPart3" style="display:none;">
+            <td>
+              <span class="item-desc">
+                <span class="item-icon">P</span>
+                <span id="partNameCell3"></span>
+              </span>
+            </td>
+            <td>1</td>
+            <td id="partUnit3">$0.00</td>
+            <td id="partTax3">$0.00</td>
+            <td id="partTotal3">$0.00</td>
+          </tr>
+
+          <tr id="rowPart4" style="display:none;">
+            <td>
+              <span class="item-desc">
+                <span class="item-icon">P</span>
+                <span id="partNameCell4"></span>
+              </span>
+            </td>
+            <td>1</td>
+            <td id="partUnit4">$0.00</td>
+            <td id="partTax4">$0.00</td>
+            <td id="partTotal4">$0.00</td>
+          </tr>
+
+          <!-- ONE LABOR LINE -->
+          <tr id="rowLaborTotal" style="display:none;">
+            <td>
+              <span class="item-desc">
+                <span class="item-icon">L</span>
+                <span>Labor – Work performed</span>
+              </span>
+            </td>
+            <td>1</td>
+            <td id="laborUnitTotal">$0.00</td>
+            <td>—</td>
+            <td id="laborTotalTotal">$0.00</td>
+          </tr>
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="4">Subtotal</td>
+            <td id="tfootSubtotal">$0.00</td>
+          </tr>
+          <tr>
+            <td colspan="4">Tax (7.96% Parts)</td>
+            <td id="tfootTax">$0.00</td>
+          </tr>
+          <tr class="totals-row">
+            <td colspan="4">Grand Total</td>
+            <td id="tfootGrandTotal">$0.00</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- Подписи -->
+      <div class="signature-block">
+        <div class="signature-row">
+          <div class="signature-col">
+            <div class="sig-line"></div>
+            <div class="sig-label">Technician Signature</div>
+          </div>
+          <div class="signature-col">
+            <div class="sig-line"></div>
+            <div class="sig-label">Customer Signature</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const TAX_RATE = 0.0796;
+      const BASE_SHARE = 0.57254812;
+
+      const companyName = document.getElementById("companyName");
+      const invoiceNumber = document.getElementById("invoiceNumber");
+      const invoiceDate = document.getElementById("invoiceDate");
+      const profitInput = document.getElementById("profit");
+
+      const partNames = [
+        document.getElementById("partName1"),
+        document.getElementById("partName2"),
+        document.getElementById("partName3"),
+        document.getElementById("partName4")
+      ];
+      const partCosts = [
+        document.getElementById("partCost1"),
+        document.getElementById("partCost2"),
+        document.getElementById("partCost3"),
+        document.getElementById("partCost4")
+      ];
+
+      const generateBtn = document.getElementById("generateBtn");
+
+      const logoText = document.getElementById("logoText");
+      const metaNumber = document.getElementById("metaNumber");
+      const metaDate = document.getElementById("metaDate");
+
+      const tfootSubtotal = document.getElementById("tfootSubtotal");
+      const tfootTax = document.getElementById("tfootTax");
+      const tfootGrandTotal = document.getElementById("tfootGrandTotal");
+
+      function fmt(num) {
+        return "$" + Number(num).toFixed(2);
+      }
+      function rnd(num) {
+        return Math.round(num * 100) / 100;
+      }
+
+      function hideRows() {
+        for (let i = 1; i <= 4; i++) {
+          document.getElementById("rowPart" + i).style.display = "none";
+        }
+        document.getElementById("rowLaborTotal").style.display = "none";
+      }
+
+      function updateHeader() {
+        const name = companyName.value.trim();
+        logoText.textContent = name || "Ваше название";
+        metaNumber.textContent = "Invoice #: " + (invoiceNumber.value.trim() || "—");
+        metaDate.textContent  = "Date: " + (invoiceDate.value.trim() || "—");
+      }
+
+      generateBtn.addEventListener("click", function () {
+        hideRows();
+        updateHeader();
+
+        const profit = parseFloat(profitInput.value);
+        if (isNaN(profit)) {
+          alert("Укажи желаемую чистую прибыль.");
+          return;
+        }
+
+        const items = [];
+        for (let i = 0; i < 4; i++) {
+          const cost = parseFloat(partCosts[i].value);
+          if (!isNaN(cost) && cost > 0) {
+            const name = partNames[i].value.trim() || ("Part " + (i + 1));
+            items.push({ idx: i + 1, name, cost });
+          }
+        }
+
+        if (items.length === 0) {
+          alert("Укажи хотя бы одну деталь с реальной ценой.");
+          return;
+        }
+
+        const realTotal = items.reduce((s, it) => s + it.cost, 0);
+
+        // базовый subtotal по формуле
+        const rawSubtotal = profit * 2 + realTotal + 20;
+
+        // общая сумма Parts (до налогов)
+        let partsPreTaxTotal = rawSubtotal * BASE_SHARE;
+        const minParts = realTotal * 1.2;
+        if (partsPreTaxTotal < minParts) partsPreTaxTotal = minParts;
+        if (partsPreTaxTotal > rawSubtotal) partsPreTaxTotal = rawSubtotal;
+        partsPreTaxTotal = rnd(partsPreTaxTotal);
+
+        // распределяем Parts пропорционально реальным ценам
+        const totalReal = realTotal;
+        let assigned = 0;
+        items.forEach((it, i) => {
+          if (i < items.length - 1) {
+            const share = it.cost / totalReal;
+            it.partPreTax = rnd(partsPreTaxTotal * share);
+            assigned += it.partPreTax;
+          } else {
+            it.partPreTax = rnd(partsPreTaxTotal - assigned);
+          }
+        });
+
+        // общий Labor (целое число долларов)
+        let laborTotal = Math.round(rawSubtotal - partsPreTaxTotal);
+
+        // налоги на Parts
+        let taxTotal = 0;
+        items.forEach(it => {
+          it.tax = rnd(it.partPreTax * TAX_RATE);
+          taxTotal += it.tax;
+        });
+        taxTotal = rnd(taxTotal);
+
+        const subtotal   = rnd(partsPreTaxTotal + laborTotal);
+        const grandTotal = rnd(subtotal + taxTotal);
+
+        // выводим Part строки
+        items.forEach(it => {
+          const i = it.idx;
+          document.getElementById("rowPart" + i).style.display = "table-row";
+          document.getElementById("partNameCell" + i).textContent = it.name;
+          document.getElementById("partUnit" + i).textContent     = fmt(it.partPreTax);
+          document.getElementById("partTax" + i).textContent      = fmt(it.tax);
+          document.getElementById("partTotal" + i).textContent    = fmt(it.partPreTax + it.tax);
+        });
+
+        // строка Labor общая
+        document.getElementById("laborUnitTotal").textContent  = fmt(laborTotal);
+        document.getElementById("laborTotalTotal").textContent = fmt(laborTotal);
+        document.getElementById("rowLaborTotal").style.display = "table-row";
+
+        // итоги
+        tfootSubtotal.textContent   = fmt(subtotal);
+        tfootTax.textContent        = fmt(taxTotal);
+        tfootGrandTotal.textContent = fmt(grandTotal);
+      });
+
+      // авто-дата
+      const t = new Date();
+      invoiceDate.value =
+        String(t.getMonth() + 1).padStart(2, "0") + "/" +
+        String(t.getDate() + 0).padStart(2, "0") + "/" +
+        t.getFullYear();
+      updateHeader();
+    })();
+  </script>
+</body>
+</html>
